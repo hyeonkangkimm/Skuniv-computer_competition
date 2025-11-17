@@ -20,7 +20,7 @@ spring:
         format_sql: true # ???? SQL ??? ?? ?? ???
 
 jwt:
-  secret: "c2t1bml2UHJvamVjdC1zcHJpbmctYm9vdC1qd3Qtc2VjcmV0LWtleS1mb3ItdGVzdGluZy1wdXJwb3NlcyE=" # 64자 이상의 임의의 문자열
+  secret: ${JWT_T}  # 64자 이상의 임의의 문자열
   expiration-in-seconds: 86400 # 토큰 만료 시간 (초) - 24시간
 crawler:
   base-url: "https://www.thinkcontest.com/thinkgood/user/contest/view.do?querystr="
