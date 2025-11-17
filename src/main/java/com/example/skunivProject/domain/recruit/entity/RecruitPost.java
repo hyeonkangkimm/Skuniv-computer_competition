@@ -37,5 +37,8 @@ public class RecruitPost extends BaseIdEntity {
     @OneToMany(mappedBy = "recruitPost")
     private List<RecruitApply> applies;
 
+    @Column(nullable = false)
+    private int maxCapacity;
+
 
 }

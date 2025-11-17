@@ -19,6 +19,7 @@ public class RecruitPostConverter {
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .status(PostStatus.OPEN) // 기본 상태
+                .maxCapacity(dto.getMaxCapacity())
                 .build();
     }
 
@@ -30,6 +31,18 @@ public class RecruitPostConverter {
                 .content(post.getContent())
                 .competitionTitle(post.getCompetition().getTitle())
                 .writerName(post.getWriter().getName())
+                .maxCapacity(post.getMaxCapacity())
+                .build();
+    }
+
+    // Entity → MyPost DTO
+    public ResponseDto.MyPost toMyPostDto(RecruitPost post) {
+        return ResponseDto.MyPost.builder()
+                .postId(post.getId())
+                .postTitle(post.getTitle())
+                .status(post.getStatus())
+                .createdAt(post.getCreatedAt())
+                .maxCapacity(post.getMaxCapacity())
                 .build();
     }
 }

@@ -27,6 +27,9 @@ public class RecruitApply extends BaseIdEntity {
     @Column(nullable = false)
     private ApplyStatus status = ApplyStatus.APPLIED;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String content;
+
 
 
 
