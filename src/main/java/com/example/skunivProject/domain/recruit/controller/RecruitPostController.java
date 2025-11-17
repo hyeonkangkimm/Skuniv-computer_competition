@@ -79,4 +79,15 @@ public class RecruitPostController {
         List<ResponseDto.FinalTeamMember> response = recruitPostService.getFinalTeam(postId, userDetails.getUsername());
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 특정 공모전의 모집공고 리스트 조회
+     */
+    @GetMapping("/competitions/{competitionId}/recruits")
+    public ResponseEntity<List<ResponseDto.RecruitPostSummaryDto>> getOpenRecruitPostsByCompetition(
+            @PathVariable Long competitionId
+    ) {
+        List<ResponseDto.RecruitPostSummaryDto> response = recruitPostService.getOpenRecruitPosts(competitionId);
+        return ResponseEntity.ok(response);
+    }
 }

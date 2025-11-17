@@ -70,4 +70,17 @@ public class ResponseDto {
         private Rank rank;
         private String phone;
     }
+
+    @Getter
+    @Builder
+    public static class RecruitPostSummaryDto {
+        private Long postId;
+        private String title;
+        private String content;
+        private String writerName;
+        private PostStatus status;
+        private long currentAcceptedCount; // 현재 승인된 인원
+        private int maxCapacity;           // 최대 인원
+        private LocalDateTime createdAt;
+    }
 }

@@ -216,4 +216,30 @@ public class RecruitPostService {
 
         return finalTeam;
     }
+
+    public List<ResponseDto.RecruitPostSummaryDto> getOpenRecruitPosts(Long competitionId) {
+        // 1. competitionId로 Competition 엔티티 조회
+        Competition competition = competitionRepository.findById(competitionId)
+                .orElseThrow(() -> new RecruitException(RecruitErrorCode.COMPETITION_NOT_FOUND));
+
+        // 2. 해당 Competition에 속하고 OPEN 상태인 모집공고를 최신순으로 조회
+        List<RecruitPost> openPosts = recruitPostRepository.findAllByCompetitionAndStatus(competition, PostStatus.OPEN, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // 3. DTO로 변환하여 반환
+        return openPosts.stream()
+                .map(post -> {
+                    long currentAcceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED);
+                    return ResponseDto.RecruitPostSummaryDto.builder()
+                            .postId(post.getId())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .writerName(post.getWriter().getName())
+                            .status(post.getStatus())
+                            .currentAcceptedCount(currentAcceptedCount)
+                            .maxCapacity(post.getMaxCapacity())
+                            .createdAt(post.getCreatedAt())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 }
