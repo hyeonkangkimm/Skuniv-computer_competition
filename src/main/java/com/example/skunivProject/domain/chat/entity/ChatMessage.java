@@ -16,7 +16,6 @@ public class ChatMessage extends BaseMongoEntity {
     private Long userId; // SQL Users PK 참조
 
     private String message;
-
     private boolean isRead = false;
 
     public void markAsRead() {
