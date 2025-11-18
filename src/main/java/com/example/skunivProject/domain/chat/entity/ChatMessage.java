@@ -1,32 +1,25 @@
 package com.example.skunivProject.domain.chat.entity;
 
-import com.example.skunivProject.global.baseentity.BaseIdEntity;
-import com.example.skunivProject.domain.users.entity.Users;
-import jakarta.persistence.*;
+import com.example.skunivProject.global.baseentity.BaseMongoEntity;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-@Table(name = "chat_message")
-public class ChatMessage extends BaseIdEntity {
+@Document(collection = "chat_messages")
+public class ChatMessage extends BaseMongoEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
-    private ChatRoom room;
+    private String roomId; // ChatRoom 컬렉션 참조 ID
+    private Long userId; // SQL Users PK 참조
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Users user;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
-    private boolean isRead = false; // 읽음 처리는 메시지에만 필요한 상태이므로 여기에 유지
+    private boolean isRead = false;
 
-    public void markAsRead(){
+    public void markAsRead() {
         this.isRead = true;
     }
 }

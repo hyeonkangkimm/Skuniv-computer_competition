@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -26,8 +27,8 @@ public class CompetitionController {
     //전체 데이터 반환
     @GetMapping("/home")
     public ResponseEntity<ApiResponse<List<ResponseDto.HomeResponseDto>>> getHomeCompetitions() {
-        // isDeleted=false인 데이터만 조회
-        List<Competition> competitions = competitionRepository.findAllByIsDeletedFalse();
+        // isDeleted=false이고, 접수 마감일이 지나지 않은 데이터만 조회
+        List<Competition> competitions = competitionRepository.findAllByIsDeletedFalseAndApplyEndAfter(LocalDateTime.now());
 
         // DTO 변환
         List<ResponseDto.HomeResponseDto> dtoList = CompetitionDtoConverter.toHomeResponseDtoList(competitions);

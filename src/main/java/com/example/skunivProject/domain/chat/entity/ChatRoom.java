@@ -1,26 +1,21 @@
 package com.example.skunivProject.domain.chat.entity;
 
-import com.example.skunivProject.global.baseentity.BaseIdEntity;
-import com.example.skunivProject.domain.team.entity.Team;
-import jakarta.persistence.*;
+import com.example.skunivProject.global.baseentity.BaseMongoEntity;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.List;
 
-@Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-@Table(name = "chat_room")
-public class ChatRoom extends BaseIdEntity {
+@Document(collection = "chat_rooms")
+public class ChatRoom extends BaseMongoEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id")
-    private Team team;
+    private Long teamId; // SQL Team PK 참조  , 참여자는 팀 멤버에서 조회
 
-    @OneToMany(mappedBy = "room")
-    private List<ChatMessage> messages;
+    private List<String> messageIds; // ChatMessage 컬렉션 ID 목록
 
-
-
+    private String name; // 채팅방 이름 등
 }
