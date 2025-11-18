@@ -17,6 +17,7 @@ public class RequestDto {
         private String phone;
         private Gender gender;
         private LocalDate birth;
+        private String email;
     }
 
     @Getter

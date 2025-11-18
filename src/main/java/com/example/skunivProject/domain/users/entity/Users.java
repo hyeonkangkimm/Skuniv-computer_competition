@@ -50,9 +50,14 @@ public class Users extends BaseIdEntity implements UserDetails {
     @Column(nullable = false)
     private int point = 0;
 
+    @Column(nullable = false)
+    private String email;
+
     public void addPoint(int points) {
         this.point += points;
     }
+
+
 
     // ================= Spring Security =================
     @Override

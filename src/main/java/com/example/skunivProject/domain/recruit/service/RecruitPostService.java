@@ -43,7 +43,7 @@ public class RecruitPostService {
         Users writer = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        if (writer.getRank() != Rank.RECRUIT) {
+        if (writer.getRank() != Rank.TREE) {
             throw new RecruitException(RecruitErrorCode.RECRUIT_NOT_ALLOWED);
         }
 

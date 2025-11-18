@@ -39,6 +39,7 @@ public class AuthService {
                 .phone(signUpDto.getPhone())
                 .gender(signUpDto.getGender())
                 .birth(signUpDto.getBirth())
+                .email(signUpDto.getEmail())
                 .build();
         // rank와 point는 엔티티에 기본값이 설정되어 있으므로 빌더에 포함하지 않음.
 

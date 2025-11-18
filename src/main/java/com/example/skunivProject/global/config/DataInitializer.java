@@ -35,11 +35,12 @@ public class DataInitializer implements CommandLineRunner {
                     .phone("010-0000-0000") // 임의의 전화번호
                     .gender(Gender.MALE)      // 임의의 성별
                     .birth(LocalDate.of(1990, 1, 1)) // 임의의 생년월일
-                    .rank(Rank.RECRUIT) // ** 목표 등급인 RECRUIT 설정 **
+                    .rank(Rank.TREE) // ** 목표 등급인 Tree 설정 **
+                    .email("kkhk75@naver.com")
                     .build();
 
             userRepository.save(masterUser);
-            log.info("초기 데이터: RECRUIT 등급의 마스터 유저 생성 완료 (username: {})", masterUsername);
+            log.info("초기 데이터: Tree 등급의 마스터 유저 생성 완료 (username: {})", masterUsername);
         }
     }
 }
