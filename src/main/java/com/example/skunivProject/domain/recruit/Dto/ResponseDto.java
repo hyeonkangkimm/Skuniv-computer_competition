@@ -53,6 +53,7 @@ public class ResponseDto {
         private PostStatus status;
         private LocalDateTime createdAt;
         private int maxCapacity;
+        private String content;
     }
 
     @Getter
@@ -62,14 +63,6 @@ public class ResponseDto {
         private ApplyStatus status;
     }
 
-    @Getter
-    @Builder
-    public static class FinalTeamMember {
-        private Long userId;
-        private String name;
-        private Rank rank;
-        private String phone;
-    }
 
     @Getter
     @Builder
@@ -82,5 +75,12 @@ public class ResponseDto {
         private long currentAcceptedCount; // 현재 승인된 인원
         private int maxCapacity;           // 최대 인원
         private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Builder
+    public static class TeamCreation {
+        private Long teamId;
+        private int memberCount;
     }
 }

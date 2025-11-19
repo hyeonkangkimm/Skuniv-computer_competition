@@ -26,11 +26,17 @@ public enum RecruitErrorCode implements BaseErrorCode {
     // 지원 상태 변경 관련
     APPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "APPLY404_1", "해당 지원을 찾을 수 없습니다."),
     FORBIDDEN_TO_UPDATE_STATUS(HttpStatus.FORBIDDEN, "APPLY403_2", "지원 상태를 변경할 권한이 없습니다."),
-    INVALID_STATUS_UPDATE(HttpStatus.BAD_REQUEST, "APPLY400_3", "APPLIED 상태에서만 상태를 변경할 수 있습니다."),
+    CANNOT_CHANGE_STATUS(HttpStatus.BAD_REQUEST, "APPLY400_3", "더 이상 변경할 수 없는 상태입니다."),
     CANNOT_UPDATE_TO_APPLIED(HttpStatus.BAD_REQUEST, "APPLY400_4", "APPLIED 상태로는 변경할 수 없습니다."),
+    SAME_STATUS_REQUEST(HttpStatus.BAD_REQUEST, "APPLY400_5", "이미 해당 상태로 처리되었습니다."),
 
-    // 최종 팀 정보 조회 관련
-    POST_NOT_CLOSED(HttpStatus.BAD_REQUEST, "TEAM400_1", "모집이 마감되지 않아 최종 팀 정보를 조회할 수 없습니다.");
+    // 최종 팀 정보 조회 및 확정 관련
+    POST_NOT_CLOSED(HttpStatus.BAD_REQUEST, "TEAM400_1", "모집이 마감되지 않아 최종 팀 정보를 조회할 수 없습니다."),
+    ALREADY_TEAM_CREATED(HttpStatus.CONFLICT, "TEAM409_1", "이미 팀이 생성된 모집공고입니다."),
+
+    // 모집공고 삭제 관련
+    FORBIDDEN_TO_DELETE(HttpStatus.FORBIDDEN, "RECRUIT403_2", "모집공고를 삭제할 권한이 없습니다."),
+    CANNOT_DELETE_CLOSED_POST(HttpStatus.BAD_REQUEST, "RECRUIT400_6", "마감된 모집공고는 삭제할 수 없습니다.");
 
 
     private final HttpStatus status;

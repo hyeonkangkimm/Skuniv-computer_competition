@@ -69,18 +69,6 @@ public class RecruitPostController {
     }
 
     /**
-     * 최종 확정된 팀원 목록 조회
-     */
-    @GetMapping("/recruit/{postId}/team")
-    public ResponseEntity<List<ResponseDto.FinalTeamMember>> getFinalTeam(
-            @PathVariable Long postId,
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        List<ResponseDto.FinalTeamMember> response = recruitPostService.getFinalTeam(postId, userDetails.getUsername());
-        return ResponseEntity.ok(response);
-    }
-
-    /**
      * 특정 공모전의 모집공고 리스트 조회
      */
     @GetMapping("/competitions/{competitionId}/recruits")
@@ -89,5 +77,17 @@ public class RecruitPostController {
     ) {
         List<ResponseDto.RecruitPostSummaryDto> response = recruitPostService.getOpenRecruitPosts(competitionId);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 모집공고 삭제
+     */
+    @DeleteMapping("/recruit/{postId}")
+    public ResponseEntity<Void> deleteRecruitPost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        recruitPostService.deleteRecruitPost(postId, userDetails.getUsername());
+        return ResponseEntity.noContent().build(); // 성공 시 204 No Content 응답
     }
 }

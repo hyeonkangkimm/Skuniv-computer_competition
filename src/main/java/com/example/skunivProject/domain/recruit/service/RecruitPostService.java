@@ -128,9 +128,11 @@ public class RecruitPostService {
         Users currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        List<RecruitPost> myPosts = recruitPostRepository.findAllByWriter(currentUser, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<RecruitPost> myOpenPosts = recruitPostRepository.findAllByWriterAndStatus(
+                currentUser, PostStatus.OPEN, Sort.by(Sort.Direction.DESC, "createdAt")
+        );
 
-        return myPosts.stream()
+        return myOpenPosts.stream()
                 .map(converter::toMyPostDto)
                 .collect(Collectors.toList());
     }
@@ -139,36 +141,36 @@ public class RecruitPostService {
     public ResponseDto.UpdateApplyStatus updateApplyStatus(Long applyId, RequestDto.UpdateApplyStatus dto, String username) {
         Users writer = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
         RecruitApply apply = recruitApplyRepository.findById(applyId)
                 .orElseThrow(() -> new RecruitException(RecruitErrorCode.APPLY_NOT_FOUND));
         RecruitPost recruitPost = apply.getRecruitPost();
+        ApplyStatus newStatus = dto.getStatus();
+        ApplyStatus currentStatus = apply.getStatus();
 
         if (!recruitPost.getWriter().getId().equals(writer.getId())) {
             throw new RecruitException(RecruitErrorCode.FORBIDDEN_TO_UPDATE_STATUS);
         }
-
-        if (dto.getStatus() == ApplyStatus.APPLIED) {
+        if (newStatus == ApplyStatus.APPLIED) {
             throw new RecruitException(RecruitErrorCode.CANNOT_UPDATE_TO_APPLIED);
         }
-        if (apply.getStatus() != ApplyStatus.APPLIED) {
-            throw new RecruitException(RecruitErrorCode.INVALID_STATUS_UPDATE);
+        if (currentStatus == newStatus) {
+            throw new RecruitException(RecruitErrorCode.SAME_STATUS_REQUEST);
         }
 
-        if (dto.getStatus() == ApplyStatus.ACCEPTED) {
+        if (newStatus == ApplyStatus.ACCEPTED) {
             long acceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(recruitPost, ApplyStatus.ACCEPTED);
             if (acceptedCount >= recruitPost.getMaxCapacity()) {
                 throw new RecruitException(RecruitErrorCode.CAPACITY_EXCEEDED);
             }
         }
 
-        apply.setStatus(dto.getStatus());
+        apply.setStatus(newStatus);
 
-        if (dto.getStatus() == ApplyStatus.ACCEPTED) {
-            long newAcceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(recruitPost, ApplyStatus.ACCEPTED);
-            if (newAcceptedCount >= recruitPost.getMaxCapacity()) {
-                recruitPost.setStatus(PostStatus.CLOSED);
-            }
+        long finalAcceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(recruitPost, ApplyStatus.ACCEPTED);
+        if (finalAcceptedCount >= recruitPost.getMaxCapacity()) {
+            recruitPost.setStatus(PostStatus.CLOSED);
+        } else {
+            recruitPost.setStatus(PostStatus.OPEN);
         }
 
         return ResponseDto.UpdateApplyStatus.builder()
@@ -177,55 +179,12 @@ public class RecruitPostService {
                 .build();
     }
 
-    public List<ResponseDto.FinalTeamMember> getFinalTeam(Long postId, String username) {
-        Users currentUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        RecruitPost recruitPost = recruitPostRepository.findById(postId)
-                .orElseThrow(() -> new RecruitException(RecruitErrorCode.RECRUIT_POST_NOT_FOUND));
-
-        if (!recruitPost.getWriter().getId().equals(currentUser.getId())) {
-            throw new RecruitException(RecruitErrorCode.FORBIDDEN_TO_VIEW_APPLIES);
-        }
-
-        if (recruitPost.getStatus() != PostStatus.CLOSED) {
-            throw new RecruitException(RecruitErrorCode.POST_NOT_CLOSED);
-        }
-
-        List<RecruitApply> acceptedApplies = recruitApplyRepository.findAllByRecruitPostAndStatus(recruitPost, ApplyStatus.ACCEPTED);
-
-        List<ResponseDto.FinalTeamMember> finalTeam = new ArrayList<>(acceptedApplies.stream()
-                .map(apply -> {
-                    Users member = apply.getUser();
-                    return ResponseDto.FinalTeamMember.builder()
-                            .userId(member.getId())
-                            .name(member.getName())
-                            .rank(member.getRank())
-                            .phone(member.getPhone())
-                            .build();
-                })
-                .collect(Collectors.toList()));
-
-        Users writer = recruitPost.getWriter();
-        finalTeam.add(0, ResponseDto.FinalTeamMember.builder()
-                .userId(writer.getId())
-                .name(writer.getName())
-                .rank(writer.getRank())
-                .phone(writer.getPhone())
-                .build());
-
-        return finalTeam;
-    }
-
     public List<ResponseDto.RecruitPostSummaryDto> getOpenRecruitPosts(Long competitionId) {
-        // 1. competitionId로 Competition 엔티티 조회
         Competition competition = competitionRepository.findById(competitionId)
                 .orElseThrow(() -> new RecruitException(RecruitErrorCode.COMPETITION_NOT_FOUND));
 
-        // 2. 해당 Competition에 속하고 OPEN 상태인 모집공고를 최신순으로 조회
         List<RecruitPost> openPosts = recruitPostRepository.findAllByCompetitionAndStatus(competition, PostStatus.OPEN, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // 3. DTO로 변환하여 반환
         return openPosts.stream()
                 .map(post -> {
                     long currentAcceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED);
@@ -241,5 +200,22 @@ public class RecruitPostService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteRecruitPost(Long postId, String username) {
+        Users currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        RecruitPost recruitPost = recruitPostRepository.findById(postId)
+                .orElseThrow(() -> new RecruitException(RecruitErrorCode.RECRUIT_POST_NOT_FOUND));
+
+        if (!recruitPost.getWriter().getId().equals(currentUser.getId())) {
+            throw new RecruitException(RecruitErrorCode.FORBIDDEN_TO_DELETE);
+        }
+        if (recruitPost.getStatus() != PostStatus.OPEN) {
+            throw new RecruitException(RecruitErrorCode.CANNOT_DELETE_CLOSED_POST);
+        }
+
+        recruitPostRepository.delete(recruitPost);
     }
 }

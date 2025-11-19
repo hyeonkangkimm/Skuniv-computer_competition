@@ -43,6 +43,7 @@ public class RecruitPostConverter {
                 .status(post.getStatus())
                 .createdAt(post.getCreatedAt())
                 .maxCapacity(post.getMaxCapacity())
+                .content(post.getContent())
                 .build();
     }
 }

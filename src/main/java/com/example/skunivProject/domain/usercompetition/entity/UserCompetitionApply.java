@@ -1,5 +1,7 @@
 package com.example.skunivProject.domain.usercompetition.entity;
 
+import com.example.skunivProject.domain.usercompetition.enums.Status;
+import com.example.skunivProject.domain.usercompetition.enums.Type;
 import com.example.skunivProject.global.baseentity.BaseIdEntity;
 import com.example.skunivProject.domain.users.entity.Users;
 import com.example.skunivProject.domain.competition.entity.Competition;
@@ -30,6 +32,6 @@ public class UserCompetitionApply extends BaseIdEntity {
     @Column(nullable = false)
     private Status status = Status.APPLIED;
 
-    public enum Type { RANDOM, DIRECT }
-    public enum Status { APPLIED, MATCHED, CANCEL }
+
+
 }

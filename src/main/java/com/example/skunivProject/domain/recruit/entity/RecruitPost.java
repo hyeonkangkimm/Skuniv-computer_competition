@@ -6,6 +6,8 @@ import com.example.skunivProject.domain.users.entity.Users;
 import com.example.skunivProject.domain.competition.entity.Competition;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,11 +36,10 @@ public class RecruitPost extends BaseIdEntity {
     @Column(nullable = false)
     private PostStatus status = PostStatus.OPEN;
 
-    @OneToMany(mappedBy = "recruitPost")
-    private List<RecruitApply> applies;
+    @OneToMany(mappedBy = "recruitPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<RecruitApply> applies = new ArrayList<>();
 
     @Column(nullable = false)
     private int maxCapacity;
-
-
 }

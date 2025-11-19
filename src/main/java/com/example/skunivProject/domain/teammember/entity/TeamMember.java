@@ -9,6 +9,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter // 편의성을 위해 Setter 추가
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
