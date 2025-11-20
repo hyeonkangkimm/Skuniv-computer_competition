@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("api/login", "api/signup","api/home").permitAll() // 로그인 및 회원가입 경로는 인증 없이 접근 가능
+                        .requestMatchers("/api/login", "/api/signup", "/api/home", "/ws/**").permitAll() // WebSocket 경로 추가
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 

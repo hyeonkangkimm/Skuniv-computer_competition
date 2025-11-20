@@ -3,43 +3,45 @@ spring:
     name: "skunivProject"
 
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL JDBC ???? ??? ??
-    url: ${DB_URL} # jdbc:mysql://localhost:3306/{???????}
-    username: ${DB_USER} # MySQL ?? ??
-    password: ${DB_PW} # MySQL ????
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PW}
+
 
   jpa:
-    database: mysql # ??? ?????? ?? ?? (MySQL)
-    database-platform: org.hibernate.dialect.MySQLDialect # Hibernate?? ??? MySQL ??(dialect) ??
-    show-sql: true # ??? SQL ??? ??? ???? ?? ??
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
     hibernate:
       ddl-auto: update
-      # ?????? ?? ? ?????? ???? ??? ??
     properties:
       hibernate:
-        format_sql: true # ???? SQL ??? ?? ?? ???
-
-jwt:
-  secret: ${JWT_T}  # 64자 이상의 임의의 문자열
-  expiration-in-seconds: 86400 # 토큰 만료 시간 (초) - 24시간
-crawler:
-  base-url: "https://www.thinkcontest.com/thinkgood/user/contest/view.do?querystr="
-  timeout: 5000
-  user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+        format_sql: true
 
   kafka:
     bootstrap-servers: localhost:9092
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      acks: all
       retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
       group-id: chat-group
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    listener:
+      ack-mode: record
 
-    data:
-      mongodb:
-        uri: mongodb://root:root1234@localhost:27017/chatdb
+  data:
+    mongodb:
+      uri: mongodb://root:root1234@localhost:27017/chatdb?authSource=admin
+
+jwt:
+  secret: ${JWT_T}
+  expiration-in-seconds: 604800 # 7일 (기존 86400에서 변경)
+
+crawler:
+  base-url: "https://www.thinkcontest.com/thinkgood/user/contest/view.do?querystr="
+  timeout: 5000
+  user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"

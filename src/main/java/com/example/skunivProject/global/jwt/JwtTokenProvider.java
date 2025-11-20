@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,7 +33,6 @@ public class JwtTokenProvider {
         this.validityInMilliseconds = validityInSeconds * 1000;
     }
 
-    // Authentication 객체를 받아 JWT 토큰을 생성
     public String createToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -50,7 +50,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // JWT 토큰에서 인증 정보를 조회
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -59,7 +58,7 @@ public class JwtTokenProvider {
                 .getBody();
 
         Object authoritiesClaim = claims.get("auth");
-        
+
         Collection<? extends GrantedAuthority> authorities = (authoritiesClaim == null || !StringUtils.hasText(authoritiesClaim.toString()))
                 ? Collections.emptyList()
                 : Arrays.stream(authoritiesClaim.toString().split(","))
@@ -71,8 +70,18 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
-    // JWT 토큰의 유효성 + 만료일자 확인
     public void validateToken(String token) {
         Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+    }
+
+    /**
+     * StompHeaderAccessor에서 토큰 추출
+     */
+    public String resolveToken(StompHeaderAccessor accessor) {
+        String bearerToken = accessor.getFirstNativeHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }

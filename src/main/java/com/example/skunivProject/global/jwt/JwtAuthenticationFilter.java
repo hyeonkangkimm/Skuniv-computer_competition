@@ -30,17 +30,25 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String token = resolveToken((HttpServletRequest) request);
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+
+        // WebSocket 연결 요청은 이 필터에서 처리하지 않고 바로 다음으로 넘김
+        if (httpServletRequest.getRequestURI().startsWith("/ws")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String token = resolveToken(httpServletRequest);
 
         try {
             if (StringUtils.hasText(token)) {
-                jwtTokenProvider.validateToken(token); // 유효성 검증. 실패 시 예외 발생
+                jwtTokenProvider.validateToken(token);
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             setErrorResponse(response, JwtErrorCode.INVALID_TOKEN);
-            return; // 예외 발생 시 필터 체인 중단
+            return;
         } catch (ExpiredJwtException e) {
             setErrorResponse(response, JwtErrorCode.EXPIRED_TOKEN);
             return;
@@ -48,7 +56,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             setErrorResponse(response, JwtErrorCode.UNSUPPORTED_TOKEN);
             return;
         } catch (IllegalArgumentException e) {
-            // getAuthentication 내부에서 발생하는 예외도 포함
             setErrorResponse(response, JwtErrorCode.INVALID_TOKEN);
             return;
         }
