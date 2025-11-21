@@ -72,8 +72,8 @@ public class ResponseDto {
         private String content;
         private String writerName;
         private PostStatus status;
-        private long currentAcceptedCount; // 현재 승인된 인원
-        private int maxCapacity;           // 최대 인원
+        private long currentAcceptedCount;
+        private int maxCapacity;
         private LocalDateTime createdAt;
     }
 
@@ -82,5 +82,16 @@ public class ResponseDto {
     public static class TeamCreation {
         private Long teamId;
         private int memberCount;
+    }
+
+    /**
+     * 1인 참가(랜덤 신청) 성공 시 결과를 담는 DTO
+     */
+    @Getter
+    @Builder
+    public static class RandomApplyResult {
+        private Long appliedPostId;
+        private String postTitle;
+        private String writerName;
     }
 }

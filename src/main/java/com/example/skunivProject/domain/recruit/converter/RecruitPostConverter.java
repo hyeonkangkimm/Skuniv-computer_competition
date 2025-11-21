@@ -20,6 +20,7 @@ public class RecruitPostConverter {
                 .content(dto.getContent())
                 .status(PostStatus.OPEN) // 기본 상태
                 .maxCapacity(dto.getMaxCapacity())
+                .randomApplySetting(dto.getRandomApplySetting()) // 필드 매핑 추가
                 .build();
     }
 

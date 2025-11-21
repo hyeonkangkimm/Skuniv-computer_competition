@@ -18,7 +18,12 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
     List<Competition> findAllByIsDeletedFalseAndApplyEndAfter(LocalDateTime now);
 
     /**
-     * 특정 thinkGoodLink를 가진 공모전이 존재하는지 확인 (중복 방지용)
+     * 특정 thinkGoodLink를 가진 공모전이 존재하는지 확인 (크롤링 중복 방지용)
      */
     boolean existsByThinkGoodLink(String thinkGoodLink);
+
+    /**
+     * 특정 제목을 가진 공모전이 존재하는지 확인 (데이터 초기화 중복 방지용)
+     */
+    boolean existsByTitle(String title);
 }

@@ -28,9 +28,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<ResponseDto.TokenDto>> login(@RequestBody RequestDto.LoginDto loginDto) {
-        ResponseDto.TokenDto tokenDto = authService.login(loginDto);
+    public ResponseEntity<ApiResponse<ResponseDto.LoginResponseDto>> login(@RequestBody RequestDto.LoginDto loginDto) {
+        ResponseDto.LoginResponseDto loginResponseDto = authService.login(loginDto);
         GeneralSuccessCode code = GeneralSuccessCode.SUCCESS;
-        return ResponseEntity.status(code.getStatus()).body(ApiResponse.onSuccess(code, tokenDto));
+        return ResponseEntity.status(code.getStatus()).body(ApiResponse.onSuccess(code, loginResponseDto));
     }
 }

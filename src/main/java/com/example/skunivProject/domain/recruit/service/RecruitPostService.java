@@ -7,6 +7,7 @@ import com.example.skunivProject.domain.recruit.entity.RecruitApply;
 import com.example.skunivProject.domain.recruit.entity.RecruitPost;
 import com.example.skunivProject.domain.recruit.enums.ApplyStatus;
 import com.example.skunivProject.domain.recruit.enums.PostStatus;
+import com.example.skunivProject.domain.recruit.enums.RandomApplySetting;
 import com.example.skunivProject.domain.recruit.exception.RecruitException;
 import com.example.skunivProject.domain.recruit.exception.code.RecruitErrorCode;
 import com.example.skunivProject.domain.recruit.repository.RecruitApplyRepository;
@@ -14,7 +15,6 @@ import com.example.skunivProject.domain.recruit.repository.RecruitPostRepository
 import com.example.skunivProject.domain.competition.entity.Competition;
 import com.example.skunivProject.domain.competition.repository.CompetitionRepository;
 import com.example.skunivProject.domain.users.entity.Users;
-import com.example.skunivProject.domain.users.enums.Rank;
 import com.example.skunivProject.domain.users.exception.UserException;
 import com.example.skunivProject.domain.users.exception.code.UserErrorCode;
 import com.example.skunivProject.domain.users.repository.UserRepository;
@@ -23,8 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,10 +42,6 @@ public class RecruitPostService {
     public ResponseDto.RecruitResDto createRecruitPost(RequestDto.RecruitReqDto dto, String username) {
         Users writer = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        if (writer.getRank() != Rank.TREE) {
-            throw new RecruitException(RecruitErrorCode.RECRUIT_NOT_ALLOWED);
-        }
 
         Competition competition = competitionRepository.findById(dto.getCompetitionId())
                 .orElseThrow(() -> new RecruitException(RecruitErrorCode.COMPETITION_NOT_FOUND));
@@ -150,6 +146,10 @@ public class RecruitPostService {
         if (!recruitPost.getWriter().getId().equals(writer.getId())) {
             throw new RecruitException(RecruitErrorCode.FORBIDDEN_TO_UPDATE_STATUS);
         }
+
+        if (currentStatus == ApplyStatus.ACCEPTED) {
+            throw new RecruitException(RecruitErrorCode.CANNOT_CHANGE_ACCEPTED_STATUS);
+        }
         if (newStatus == ApplyStatus.APPLIED) {
             throw new RecruitException(RecruitErrorCode.CANNOT_UPDATE_TO_APPLIED);
         }
@@ -217,5 +217,63 @@ public class RecruitPostService {
         }
 
         recruitPostRepository.delete(recruitPost);
+    }
+
+    @Transactional
+    public ResponseDto.RandomApplyResult randomApply(RequestDto.RandomApply dto, String username) {
+        Users applicant = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        List<RecruitPost> availablePosts = recruitPostRepository.findAllByStatusAndRandomApplySetting(PostStatus.OPEN, RandomApplySetting.ALLOW);
+
+        List<RecruitPost> filteredPosts = availablePosts.stream()
+                .filter(post -> !post.getWriter().getId().equals(applicant.getId()))
+                .filter(post -> !recruitApplyRepository.existsByRecruitPostAndUser(post, applicant))
+                .collect(Collectors.toList());
+
+        if (filteredPosts.isEmpty()) {
+            throw new RecruitException(RecruitErrorCode.NO_AVAILABLE_RANDOM_POST);
+        }
+
+        List<RecruitPost> postsWithRemainingCapacity = filteredPosts.stream()
+                .filter(post -> {
+                    long acceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED);
+                    return post.getMaxCapacity() > acceptedCount;
+                })
+                .collect(Collectors.toList());
+
+        if (postsWithRemainingCapacity.isEmpty()) {
+            throw new RecruitException(RecruitErrorCode.NO_AVAILABLE_RANDOM_POST);
+        }
+
+        long minRemainingCapacity = postsWithRemainingCapacity.stream()
+                .mapToLong(post -> post.getMaxCapacity() - recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED))
+                .min()
+                .orElse(Long.MAX_VALUE);
+
+        List<RecruitPost> bestFitPosts = postsWithRemainingCapacity.stream()
+                .filter(post -> (post.getMaxCapacity() - recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED)) == minRemainingCapacity)
+                .collect(Collectors.toList());
+
+        RecruitPost targetPost = bestFitPosts.get(new Random().nextInt(bestFitPosts.size()));
+
+        RecruitApply newApply = RecruitApply.builder()
+                .recruitPost(targetPost)
+                .user(applicant)
+                .content(dto.getContent())
+                .status(ApplyStatus.ACCEPTED)
+                .build();
+        recruitApplyRepository.save(newApply);
+
+        long finalAcceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(targetPost, ApplyStatus.ACCEPTED);
+        if (finalAcceptedCount >= targetPost.getMaxCapacity()) {
+            targetPost.setStatus(PostStatus.CLOSED);
+        }
+
+        return ResponseDto.RandomApplyResult.builder()
+                .appliedPostId(targetPost.getId())
+                .postTitle(targetPost.getTitle())
+                .writerName(targetPost.getWriter().getName())
+                .build();
     }
 }

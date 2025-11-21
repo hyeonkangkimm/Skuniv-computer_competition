@@ -12,9 +12,11 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
 
     /**
      * 특정 채팅방의 메시지를 페이징하여 조회합니다.
-     * @param roomId 채팅방 ID
-     * @param pageable 페이징 정보 (예: 최신 50개)
-     * @return 메시지 목록
      */
     List<ChatMessage> findByRoomId(String roomId, Pageable pageable);
+
+    /**
+     * 특정 채팅방의 모든 메시지를 삭제합니다.
+     */
+    void deleteAllByRoomId(String roomId);
 }

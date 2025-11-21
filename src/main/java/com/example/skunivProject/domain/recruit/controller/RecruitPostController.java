@@ -19,7 +19,7 @@ public class RecruitPostController {
 
     private final RecruitPostService recruitPostService;
 
-    //모집공고 생성
+    //모집공고 올리기
     @PostMapping("/recruit")
     public ResponseEntity<ResponseDto.RecruitResDto> createRecruitPost(
             @RequestBody RequestDto.RecruitReqDto dto,
@@ -28,6 +28,7 @@ public class RecruitPostController {
         ResponseDto.RecruitResDto response = recruitPostService.createRecruitPost(dto, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
     //모집공고 지원
     @PostMapping("/recruit/{postId}/apply")
     public ResponseEntity<ResponseDto.Apply> applyToRecruitPost(
@@ -39,7 +40,7 @@ public class RecruitPostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    //공고 지원자 목록 조회
+    //공고 지원자 목록 리스트 조회
     @GetMapping("/recruit/{postId}/applies")
     public ResponseEntity<List<ResponseDto.ApplyDetail>> getAppliesForPost(
             @PathVariable Long postId,
@@ -49,7 +50,8 @@ public class RecruitPostController {
         return ResponseEntity.ok(response);
     }
 
-    //나의 공고 조회
+
+    //나의 공고 조회(나무등급) 리스트조회
     @GetMapping("/my/recruit-posts")
     public ResponseEntity<List<ResponseDto.MyPost>> getMyRecruitPosts(
             @AuthenticationPrincipal UserDetails userDetails
@@ -57,7 +59,9 @@ public class RecruitPostController {
         List<ResponseDto.MyPost> response = recruitPostService.getMyRecruitPosts(userDetails.getUsername());
         return ResponseEntity.ok(response);
     }
-    //지원 상태 변경
+
+
+    //지원한 사람 상태 변경
     @PatchMapping("/recruit/applies/{applyId}")
     public ResponseEntity<ResponseDto.UpdateApplyStatus> updateApplyStatus(
             @PathVariable Long applyId,
@@ -68,9 +72,7 @@ public class RecruitPostController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 특정 공모전의 모집공고 리스트 조회
-     */
+    //특정 공모전의 모집공고 리스트 조회 모든사람 접근 가능 홈화면에서 모집공고 상세 넘어올때
     @GetMapping("/competitions/{competitionId}/recruits")
     public ResponseEntity<List<ResponseDto.RecruitPostSummaryDto>> getOpenRecruitPostsByCompetition(
             @PathVariable Long competitionId
@@ -79,15 +81,23 @@ public class RecruitPostController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 모집공고 삭제
-     */
+    //모집공고 삭제
     @DeleteMapping("/recruit/{postId}")
     public ResponseEntity<Void> deleteRecruitPost(
             @PathVariable Long postId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         recruitPostService.deleteRecruitPost(postId, userDetails.getUsername());
-        return ResponseEntity.noContent().build(); // 성공 시 204 No Content 응답
+        return ResponseEntity.noContent().build();
+    }
+
+    //1인참가인 사람의 랜덤 참가
+    @PostMapping("/recruits/random-apply")
+    public ResponseEntity<ResponseDto.RandomApplyResult> randomApply(
+            @RequestBody RequestDto.RandomApply dto,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        ResponseDto.RandomApplyResult response = recruitPostService.randomApply(dto, userDetails.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

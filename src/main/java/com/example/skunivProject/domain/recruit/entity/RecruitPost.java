@@ -1,6 +1,7 @@
 package com.example.skunivProject.domain.recruit.entity;
 
 import com.example.skunivProject.domain.recruit.enums.PostStatus;
+import com.example.skunivProject.domain.recruit.enums.RandomApplySetting;
 import com.example.skunivProject.global.baseentity.BaseIdEntity;
 import com.example.skunivProject.domain.users.entity.Users;
 import com.example.skunivProject.domain.competition.entity.Competition;
@@ -35,6 +36,11 @@ public class RecruitPost extends BaseIdEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PostStatus status = PostStatus.OPEN;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RandomApplySetting randomApplySetting = RandomApplySetting.DENY; // 랜덤 신청 설정 필드 추가
 
     @OneToMany(mappedBy = "recruitPost", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

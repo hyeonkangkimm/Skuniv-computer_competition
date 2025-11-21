@@ -15,8 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -41,34 +39,33 @@ public class AuthService {
                 .birth(signUpDto.getBirth())
                 .email(signUpDto.getEmail())
                 .build();
-        // rank와 point는 엔티티에 기본값이 설정되어 있으므로 빌더에 포함하지 않음.
-
         userRepository.save(users);
     }
 
     @Transactional
-    public ResponseDto.TokenDto login(RequestDto.LoginDto loginDto) {
+    public ResponseDto.LoginResponseDto login(RequestDto.LoginDto loginDto) {
 
-        // 1. 아이디 존재 여부 체크
+        // 1. 아이디 존재 여부 및 비밀번호 검증
         Users user = userRepository.findByUsername(loginDto.getUsername())
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        // 2. 비밀번호 검증
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
             throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
 
-        // 3. JWT 토큰 생성
+        // 2. Spring Security 인증 토큰 생성 및 인증
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
-
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        // 3. JWT 토큰 생성
         String accessToken = jwtTokenProvider.createToken(authentication);
 
-        return ResponseDto.TokenDto.builder()
+        // 4. 응답 DTO에 추가 정보(name, rank)를 담아 반환
+        return ResponseDto.LoginResponseDto.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
+                .name(user.getName()) // 사용자 이름 추가
+                .rank(user.getRank())   // 사용자 등급 추가
                 .build();
     }
-
 }

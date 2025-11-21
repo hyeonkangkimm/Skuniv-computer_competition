@@ -35,7 +35,7 @@ public class Team extends BaseIdEntity {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20) // 컬럼 길이를 넉넉하게 20으로 설정
     private Status status = Status.FORMING;
 
     @Builder.Default
