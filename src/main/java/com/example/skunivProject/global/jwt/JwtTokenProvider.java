@@ -1,6 +1,8 @@
 package com.example.skunivProject.global.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +43,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date validity = new Date(now.getTime() + this.validityInMilliseconds);
 
+        // todo JWT의 claims aud 필드들 용도 확인해서 제대로 써봐.
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)

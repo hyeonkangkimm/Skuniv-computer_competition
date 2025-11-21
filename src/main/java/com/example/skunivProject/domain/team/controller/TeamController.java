@@ -1,6 +1,7 @@
 package com.example.skunivProject.domain.team.controller;
 
 import com.example.skunivProject.domain.recruit.Dto.ResponseDto;
+import com.example.skunivProject.domain.team.dto.ResponseDto.MyTeamDto;
 import com.example.skunivProject.domain.team.entity.Team;
 import com.example.skunivProject.domain.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -36,5 +36,16 @@ public class TeamController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * 나의 팀 목록 조회
+     */
+    @GetMapping("/my/teams")
+    public ResponseEntity<List<MyTeamDto>> getMyTeams(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        List<MyTeamDto> response = teamService.getMyTeams(userDetails.getUsername());
+        return ResponseEntity.ok(response);
     }
 }

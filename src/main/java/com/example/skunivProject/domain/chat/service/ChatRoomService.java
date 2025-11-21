@@ -66,6 +66,7 @@ public class ChatRoomService {
 
         return myTeamMemberships.stream()
                 .map(TeamMember::getTeam)
+                .distinct()
                 .map(team -> chatRoomRepository.findByTeamId(team.getId())
                         .map(chatRoom -> ResponseDto.ChatRoomInfo.builder()
                                 .roomId(chatRoom.getId())
@@ -75,20 +76,5 @@ public class ChatRoomService {
                         .orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public boolean isUserMemberOfChatRoom(String username, String roomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElse(null);
-        if (chatRoom == null) return false;
-
-        Team team = teamRepository.findById(chatRoom.getTeamId()).orElse(null);
-        if (team == null) return false;
-
-        Users user = userRepository.findByUsername(username).orElse(null);
-        if (user == null) return false;
-
-        return team.getMembers().stream()
-                .anyMatch(member -> member.getUser().getId().equals(user.getId()));
     }
 }

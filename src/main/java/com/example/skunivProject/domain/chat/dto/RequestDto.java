@@ -1,17 +1,29 @@
 package com.example.skunivProject.domain.chat.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class RequestDto {
 
-    @Getter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class ChatMessageSend {   // 사용자가 WebSocket으로 메시지 보낼 때
+    public static class ChatMessageDto {
         private String roomId;
-        private Long senderId;
-        private String senderName;
+        private Long userId;
+        private String message;
+        private long timestamp;
+    }
+
+    @Data
+    public static class ChatSocketRequest {
+        private String type; // ENTER / MESSAGE
+        private String roomId;
+        private Long userId;
         private String message;
     }
+
 }

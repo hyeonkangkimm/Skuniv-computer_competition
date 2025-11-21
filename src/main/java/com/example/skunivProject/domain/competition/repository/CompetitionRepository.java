@@ -16,4 +16,9 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
      * 삭제되지 않았고, 접수 마감일이 현재 시간 이후인 공모전만 조회
      */
     List<Competition> findAllByIsDeletedFalseAndApplyEndAfter(LocalDateTime now);
+
+    /**
+     * 특정 thinkGoodLink를 가진 공모전이 존재하는지 확인 (중복 방지용)
+     */
+    boolean existsByThinkGoodLink(String thinkGoodLink);
 }

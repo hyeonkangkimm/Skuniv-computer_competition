@@ -1,7 +1,9 @@
 package com.example.skunivProject.domain.chat.controller;
 
 import com.example.skunivProject.domain.chat.dto.ResponseDto;
+import com.example.skunivProject.domain.chat.entity.ChatMessage;
 import com.example.skunivProject.domain.chat.entity.ChatRoom;
+import com.example.skunivProject.domain.chat.service.ChatMessageService;
 import com.example.skunivProject.domain.chat.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import java.util.List;
 public class ChatController {
 
     private final ChatRoomService chatRoomService;
+    private final ChatMessageService chatMessageService;
 
     /**
      * 팀 채팅방 생성
@@ -27,10 +30,8 @@ public class ChatController {
             @PathVariable Long teamId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        // 서비스를 호출하여 채팅방 생성 로직 수행
         ChatRoom newChatRoom = chatRoomService.createChatRoom(teamId, userDetails.getUsername());
 
-        // 응답 DTO 생성
         ResponseDto.ChatRoomCreation response = ResponseDto.ChatRoomCreation.builder()
                 .roomId(newChatRoom.getId())
                 .roomName(newChatRoom.getName())
@@ -49,5 +50,20 @@ public class ChatController {
     ) {
         List<ResponseDto.ChatRoomInfo> response = chatRoomService.getMyChatRooms(userDetails.getUsername());
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 특정 채팅방의 이전 대화 내역 조회 (인가 로직 제거됨)
+     */
+    // TODO @PreAuthorize() + Spel
+    @GetMapping("/chat/rooms/{roomId}/messages")
+    public ResponseEntity<List<ChatMessage>> getChatMessages(
+            @PathVariable String roomId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size
+    ) {
+        // 인가 로직 없이 바로 서비스 호출
+        List<ChatMessage> messages = chatMessageService.getChatMessages(roomId, page, size);
+        return ResponseEntity.ok(messages);
     }
 }

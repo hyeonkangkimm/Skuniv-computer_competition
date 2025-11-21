@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -31,9 +32,16 @@ public class ContestCrawlerService {
         this.config = config;
     }
 
+    @Transactional
     public void crawlAndSave(String contestUrl) {
         log.info("==== 크롤링 시작: {} ====", contestUrl);
         try {
+
+            //중복 확인: DB에 이미 존재하는 공모전인지 thinkGoodLink로 확인
+            if (competitionRepository.existsByThinkGoodLink(contestUrl)) {
+                log.info("이미 존재하는 공모전입니다. 건너뜁니다: {}", contestUrl);
+                return; // 이미 존재하면 여기서 함수 종료
+            }
             Document doc = Jsoup.connect(contestUrl)
                     .userAgent(config.getUserAgent())
                     .timeout(config.getTimeout())
@@ -94,10 +102,17 @@ public class ContestCrawlerService {
             // 9. 씽굿 링크 (현재 크롤링 URL)
             String thinkGoodLink = contestUrl;
 
-            // 10. 이미지 URL
+            //10 이미지 url 크롤링
             String imgUrl = Optional.ofNullable(doc.selectFirst(".img-wrap a img"))
-                    .map(e -> e.attr("src")).orElse("");
-
+                    .map(e -> {
+                        String src = e.attr("src");
+                        // src가 상대경로라면 도메인 붙이기
+                        if (!src.startsWith("http")) {
+                            src = "https://www.thinkcontest.com" + src;
+                        }
+                        return src;
+                    })
+                    .orElse("");
             // 엔티티 생성
             Competition competition = Competition.builder()
                     .title(title)

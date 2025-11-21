@@ -1,31 +1,9 @@
 package com.example.skunivProject.domain.chat.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 public class ResponseDto {
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class ChatMessage {   // 웹소켓 → Kafka → 웹소켓 브로드캐스트용
-        private String roomId;
-        private String type;
-        private MessageBody body;
-
-        @Getter
-        @Setter
-        @NoArgsConstructor
-        @AllArgsConstructor
-        @Builder
-        public static class MessageBody {
-            private Long senderId;
-            private String senderName;
-            private String message;
-            private Long timestamp;
-        }
-    }
 
     @Getter
     @Builder
