@@ -37,7 +37,7 @@ public enum RecruitErrorCode implements BaseErrorCode {
 
     // 모집공고 삭제 관련
     FORBIDDEN_TO_DELETE(HttpStatus.FORBIDDEN, "RECRUIT403_2", "모집공고를 삭제할 권한이 없습니다."),
-    CANNOT_DELETE_CLOSED_POST(HttpStatus.BAD_REQUEST, "RECRUIT400_6", "마감된 모집공고는 삭제할 수 없습니다."),
+    CANNOT_DELETE_TEAM_CREATED_POST(HttpStatus.BAD_REQUEST, "RECRUIT400_7", "이미 팀이 생성된 모집공고는 삭제할 수 없습니다."),
 
     // 1인 참가(랜덤 신청) 관련
     NO_AVAILABLE_RANDOM_POST(HttpStatus.NOT_FOUND, "RECRUIT404_2", "현재 1인 참가가 가능한 모집공고가 없습니다.");

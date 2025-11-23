@@ -172,16 +172,4 @@ public class TeamService {
                 })
                 .collect(Collectors.toList());
     }
-
-    @Transactional(readOnly = true)
-    public boolean isTeamMember(Long teamId, String username) {
-        Team team = teamRepository.findById(teamId).orElse(null);
-        if (team == null) return false;
-
-        Users user = userRepository.findByUsername(username).orElse(null);
-        if (user == null) return false;
-
-        return team.getMembers().stream()
-                .anyMatch(member -> member.getUser().getId().equals(user.getId()));
-    }
 }

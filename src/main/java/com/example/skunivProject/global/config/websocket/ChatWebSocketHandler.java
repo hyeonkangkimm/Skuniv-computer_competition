@@ -48,7 +48,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 // ChatMessageDto 객체 생성 (Long userId 그대로 사용)
                 RequestDto.ChatMessageDto kafkaMsg = RequestDto.ChatMessageDto.builder()
                         .roomId(req.getRoomId())
-                        .userId(req.getUserId())  // Long 타입
+                        .userId(req.getUserId()) // Long 타입
                         .message(req.getMessage())
                         .timestamp(System.currentTimeMillis())
                         .build();

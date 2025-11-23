@@ -1,6 +1,7 @@
 package com.example.skunivProject.domain.recruit.Dto;
 
 import com.example.skunivProject.domain.recruit.enums.ApplyStatus;
+import com.example.skunivProject.domain.recruit.enums.ApplyType;
 import com.example.skunivProject.domain.recruit.enums.PostStatus;
 import com.example.skunivProject.domain.users.enums.Rank;
 import lombok.*;
@@ -42,6 +43,7 @@ public class ResponseDto {
         private Rank applicantRank;
         private String content;
         private ApplyStatus status;
+        private ApplyType applyType; // 지원 방식 필드 추가
         private String applicantPhone;
     }
 
@@ -84,9 +86,6 @@ public class ResponseDto {
         private int memberCount;
     }
 
-    /**
-     * 1인 참가(랜덤 신청) 성공 시 결과를 담는 DTO
-     */
     @Getter
     @Builder
     public static class RandomApplyResult {

@@ -1,19 +1,21 @@
 package com.example.skunivProject.domain.recruit.service;
 
+import com.example.skunivProject.domain.competition.entity.Competition;
+import com.example.skunivProject.domain.competition.repository.CompetitionRepository;
 import com.example.skunivProject.domain.recruit.Dto.RequestDto;
 import com.example.skunivProject.domain.recruit.Dto.ResponseDto;
 import com.example.skunivProject.domain.recruit.converter.RecruitPostConverter;
 import com.example.skunivProject.domain.recruit.entity.RecruitApply;
 import com.example.skunivProject.domain.recruit.entity.RecruitPost;
 import com.example.skunivProject.domain.recruit.enums.ApplyStatus;
+import com.example.skunivProject.domain.recruit.enums.ApplyType;
 import com.example.skunivProject.domain.recruit.enums.PostStatus;
 import com.example.skunivProject.domain.recruit.enums.RandomApplySetting;
 import com.example.skunivProject.domain.recruit.exception.RecruitException;
 import com.example.skunivProject.domain.recruit.exception.code.RecruitErrorCode;
 import com.example.skunivProject.domain.recruit.repository.RecruitApplyRepository;
 import com.example.skunivProject.domain.recruit.repository.RecruitPostRepository;
-import com.example.skunivProject.domain.competition.entity.Competition;
-import com.example.skunivProject.domain.competition.repository.CompetitionRepository;
+import com.example.skunivProject.domain.team.repository.TeamRepository;
 import com.example.skunivProject.domain.users.entity.Users;
 import com.example.skunivProject.domain.users.exception.UserException;
 import com.example.skunivProject.domain.users.exception.code.UserErrorCode;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -37,6 +40,7 @@ public class RecruitPostService {
     private final UserRepository userRepository;
     private final RecruitApplyRepository recruitApplyRepository;
     private final RecruitPostConverter converter;
+    private final TeamRepository teamRepository;
 
     @Transactional
     public ResponseDto.RecruitResDto createRecruitPost(RequestDto.RecruitReqDto dto, String username) {
@@ -59,18 +63,15 @@ public class RecruitPostService {
     public ResponseDto.Apply applyToRecruitPost(Long postId, RequestDto.Apply dto, String username) {
         Users applicant = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
         RecruitPost recruitPost = recruitPostRepository.findById(postId)
                 .orElseThrow(() -> new RecruitException(RecruitErrorCode.RECRUIT_POST_NOT_FOUND));
 
         if (recruitPost.getWriter().getId().equals(applicant.getId())) {
             throw new RecruitException(RecruitErrorCode.CANNOT_APPLY_TO_OWN_POST);
         }
-
         if (recruitApplyRepository.existsByRecruitPostAndUser(recruitPost, applicant)) {
             throw new RecruitException(RecruitErrorCode.ALREADY_APPLIED);
         }
-
         long acceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(recruitPost, ApplyStatus.ACCEPTED);
         if (acceptedCount >= recruitPost.getMaxCapacity()) {
             throw new RecruitException(RecruitErrorCode.CAPACITY_EXCEEDED);
@@ -81,8 +82,8 @@ public class RecruitPostService {
                 .user(applicant)
                 .content(dto.getContent())
                 .status(ApplyStatus.APPLIED)
+                .applyType(ApplyType.NORMAL)
                 .build();
-
         recruitApplyRepository.save(newApply);
 
         return ResponseDto.Apply.builder()
@@ -115,6 +116,7 @@ public class RecruitPostService {
                         .applicantRank(apply.getUser().getRank())
                         .content(apply.getContent())
                         .status(apply.getStatus())
+                        .applyType(apply.getApplyType())
                         .applicantPhone(apply.getUser().getPhone())
                         .build())
                 .collect(Collectors.toList());
@@ -124,11 +126,21 @@ public class RecruitPostService {
         Users currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        List<RecruitPost> myOpenPosts = recruitPostRepository.findAllByWriterAndStatus(
-                currentUser, PostStatus.OPEN, Sort.by(Sort.Direction.DESC, "createdAt")
+        List<PostStatus> statuses = Arrays.asList(PostStatus.OPEN, PostStatus.CLOSED);
+        List<RecruitPost> myPosts = recruitPostRepository.findAllByWriterAndStatusIn(
+                currentUser, statuses, Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        return myOpenPosts.stream()
+        return myPosts.stream()
+                .filter(post -> {
+                    if (post.getStatus() == PostStatus.OPEN) {
+                        return true;
+                    }
+                    if (post.getStatus() == PostStatus.CLOSED) {
+                        return !teamRepository.existsByRecruitPost(post);
+                    }
+                    return false;
+                })
                 .map(converter::toMyPostDto)
                 .collect(Collectors.toList());
     }
@@ -183,9 +195,21 @@ public class RecruitPostService {
         Competition competition = competitionRepository.findById(competitionId)
                 .orElseThrow(() -> new RecruitException(RecruitErrorCode.COMPETITION_NOT_FOUND));
 
-        List<RecruitPost> openPosts = recruitPostRepository.findAllByCompetitionAndStatus(competition, PostStatus.OPEN, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<PostStatus> statuses = Arrays.asList(PostStatus.OPEN, PostStatus.CLOSED);
+        List<RecruitPost> posts = recruitPostRepository.findAllByCompetitionAndStatusIn(
+                competition, statuses, Sort.by(Sort.Direction.DESC, "createdAt")
+        );
 
-        return openPosts.stream()
+        return posts.stream()
+                .filter(post -> {
+                    if (post.getStatus() == PostStatus.OPEN) {
+                        return true;
+                    }
+                    if (post.getStatus() == PostStatus.CLOSED) {
+                        return !teamRepository.existsByRecruitPost(post);
+                    }
+                    return false;
+                })
                 .map(post -> {
                     long currentAcceptedCount = recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED);
                     return ResponseDto.RecruitPostSummaryDto.builder()
@@ -212,8 +236,9 @@ public class RecruitPostService {
         if (!recruitPost.getWriter().getId().equals(currentUser.getId())) {
             throw new RecruitException(RecruitErrorCode.FORBIDDEN_TO_DELETE);
         }
-        if (recruitPost.getStatus() != PostStatus.OPEN) {
-            throw new RecruitException(RecruitErrorCode.CANNOT_DELETE_CLOSED_POST);
+
+        if (teamRepository.existsByRecruitPost(recruitPost)) {
+            throw new RecruitException(RecruitErrorCode.CANNOT_DELETE_TEAM_CREATED_POST);
         }
 
         recruitPostRepository.delete(recruitPost);
@@ -262,6 +287,7 @@ public class RecruitPostService {
                 .user(applicant)
                 .content(dto.getContent())
                 .status(ApplyStatus.ACCEPTED)
+                .applyType(ApplyType.RANDOM)
                 .build();
         recruitApplyRepository.save(newApply);
 

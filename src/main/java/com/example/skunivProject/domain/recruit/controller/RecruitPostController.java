@@ -51,7 +51,7 @@ public class RecruitPostController {
     }
 
 
-    //나의 공고 조회(나무등급) 리스트조회
+    //나의 공고 조회 리스트조회
     @GetMapping("/my/recruit-posts")
     public ResponseEntity<List<ResponseDto.MyPost>> getMyRecruitPosts(
             @AuthenticationPrincipal UserDetails userDetails
