@@ -10,7 +10,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketStompBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
-     * configureMessageBroker() : 메시지 브로커 옵션을 구성합니다.
+     * configureMessageBroker() : 메시지 브로커 옵션을 구성
      * 현재구조에서는 STOMP 브로커 구조를 사용하지 않는다.
      * @param config
      */

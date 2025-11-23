@@ -19,7 +19,7 @@ public class ChatMessageService {
     // ChatRoomService, UserRepository 의존성 제거
 
     /**
-     * 채팅 메시지를 MongoDB에 저장합니다.
+     * 채팅 메시지를 MongoDB에 저장
      */
     @Transactional
     public ChatMessage saveMessage(String roomId, Long userId, String message) {
@@ -32,7 +32,7 @@ public class ChatMessageService {
     }
 
     /**
-     * 특정 채팅방의 이전 대화 내역을 페이징하여 조회합니다. (인가 로직 제거됨)
+     * 특정 채팅방의 이전 대화 내역을 페이징하여 조회
      */
     @Transactional(readOnly = true)
     public List<ChatMessage> getChatMessages(String roomId, int page, int size) {

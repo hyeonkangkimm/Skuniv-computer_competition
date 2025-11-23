@@ -11,12 +11,12 @@ import java.util.List;
 public interface ChatMessageRepository extends MongoRepository<ChatMessage, String> {
 
     /**
-     * 특정 채팅방의 메시지를 페이징하여 조회합니다.
+     * 특정 채팅방의 메시지를 페이징하여 조회
      */
     List<ChatMessage> findByRoomId(String roomId, Pageable pageable);
 
     /**
-     * 특정 채팅방의 모든 메시지를 삭제합니다.
+     * 특정 채팅방의 모든 메시지를 삭제
      */
     void deleteAllByRoomId(String roomId);
 }
