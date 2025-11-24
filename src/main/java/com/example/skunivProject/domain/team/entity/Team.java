@@ -1,11 +1,11 @@
 package com.example.skunivProject.domain.team.entity;
 
+import com.example.skunivProject.domain.competition.entity.Competition;
 import com.example.skunivProject.domain.recruit.entity.RecruitPost;
 import com.example.skunivProject.domain.team.enums.CreateType;
 import com.example.skunivProject.domain.team.enums.Status;
 import com.example.skunivProject.domain.teammember.entity.TeamMember;
 import com.example.skunivProject.global.baseentity.BaseIdEntity;
-import com.example.skunivProject.domain.competition.entity.Competition;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,7 +35,7 @@ public class Team extends BaseIdEntity {
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20) // 컬럼 길이를 넉넉하게 20으로 설정
+    @Column(nullable = false, length = 20)
     private Status status = Status.FORMING;
 
     @Builder.Default

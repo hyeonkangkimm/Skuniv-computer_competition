@@ -11,7 +11,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(
-                        "https://*.ngrok-free.dev",     // ngrok 모든 URL 자동 허용
+                        "https://*.ngrok-free.dev", // ngrok 모든 URL 자동 허용
+                        "https://nonsegmentary-sharmaine-puerile.ngrok-free.dev",
                         "http://localhost:3000",
                         "http://localhost:5173"// 로컬 프론트
                 )

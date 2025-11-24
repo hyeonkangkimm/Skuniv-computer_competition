@@ -14,6 +14,8 @@ public class RequestDto {
     public static class ChatMessageDto {
         private String roomId;
         private Long userId;
+        private String username;
+        private String name;
         private String message;
         private long timestamp;
     }
@@ -23,6 +25,8 @@ public class RequestDto {
         private String type; // ENTER / MESSAGE
         private String roomId;
         private Long userId;
+        private String username;
+        private String name;
         private String message;
     }
 

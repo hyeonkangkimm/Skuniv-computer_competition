@@ -121,7 +121,7 @@ public class DataInitializer implements CommandLineRunner {
                     .awardFirst("1000만원")
                     .homePage("http://example.com")
                     .thinkGoodLink("http://example.com/finished")
-                    .imgUrl("http://example.com/image.jpg")
+                    .imgUrl("https://www.thinkcontest.com/thinkgood/common/display.do?filepath=contest_poster/image/&filename=ede23a4443af4c829d4e96bbb148cdeb.jpg&filegubun=poster")
                     .build();
             competitionRepository.save(finishedCompetition);
             log.info("초기 데이터: 종료된 공모전 생성 완료 (title: {})", finishedContestTitle);

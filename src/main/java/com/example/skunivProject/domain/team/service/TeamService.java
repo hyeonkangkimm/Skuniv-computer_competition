@@ -98,6 +98,12 @@ public class TeamService {
                 .distinct()
                 .filter(team -> team.getStatus() == Status.COMPLETE)
                 .map(team -> {
+                    Long leaderId = team.getMembers().stream()
+                            .filter(member -> member.getRole() == Role.LEADER)
+                            .findFirst()
+                            .map(leaderMember -> leaderMember.getUser().getId())
+                            .orElse(null);
+
                     List<String> memberNames = team.getMembers().stream()
                             .map(member -> member.getUser().getName())
                             .collect(Collectors.toList());
@@ -108,7 +114,10 @@ public class TeamService {
 
                     return ResponseDto.MyTeamDto.builder()
                             .userId(currentUser.getId())
+                            .username(currentUser.getUsername())
+                            .name(currentUser.getName())
                             .teamId(team.getId())
+                            .leaderId(leaderId)
                             .competitionTitle(team.getCompetition().getTitle())
                             .memberNames(memberNames)
                             .roomStatus(roomStatus)

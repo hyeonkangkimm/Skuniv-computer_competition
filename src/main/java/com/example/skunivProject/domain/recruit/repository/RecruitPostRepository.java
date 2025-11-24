@@ -21,10 +21,15 @@ public interface RecruitPostRepository extends JpaRepository<RecruitPost, Long> 
 
     List<RecruitPost> findAllByWriterAndStatusIn(Users writer, Collection<PostStatus> statuses, Sort sort);
 
-    List<RecruitPost> findAllByStatusAndRandomApplySetting(PostStatus status, RandomApplySetting randomApplySetting);
+    List<RecruitPost> findAllByCompetitionAndStatusIn(Competition competition, Collection<PostStatus> statuses, Sort sort);
 
     /**
-     * 특정 공모전에 속하고, 주어진 상태 목록(예: OPEN, CLOSED)에 포함되는 모든 모집공고를 정렬하여 조회
+     * [수정] 특정 공모전 내에서 1인 참가가 가능하고, 모집 중인 모든 공고를 조회합니다.
      */
-    List<RecruitPost> findAllByCompetitionAndStatusIn(Competition competition, Collection<PostStatus> statuses, Sort sort);
+    List<RecruitPost> findAllByCompetitionAndStatusAndRandomApplySetting(Competition competition, PostStatus status, RandomApplySetting randomApplySetting);
+
+    /**
+     * [추가] 특정 공모전(Competition)에 특정 작성자(Writer)가 작성한 모집글이 있는지 확인
+     */
+    boolean existsByCompetitionAndWriter(Competition competition, Users writer);
 }

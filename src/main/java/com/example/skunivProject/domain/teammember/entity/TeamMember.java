@@ -1,15 +1,15 @@
 package com.example.skunivProject.domain.teammember.entity;
 
-import com.example.skunivProject.domain.teammember.enums.Role;
-import com.example.skunivProject.global.baseentity.BaseIdEntity;
-import com.example.skunivProject.domain.users.entity.Users;
 import com.example.skunivProject.domain.team.entity.Team;
+import com.example.skunivProject.domain.teammember.enums.Role;
+import com.example.skunivProject.domain.users.entity.Users;
+import com.example.skunivProject.global.baseentity.BaseIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@Setter // 편의성을 위해 Setter 추가
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -29,7 +29,7 @@ public class TeamMember extends BaseIdEntity {
     @Column(nullable = false)
     private Role role = Role.MEMBER;
 
-    public void changeRole(Role newRole){
+    public void changeRole(Role newRole) {
         this.role = newRole;
     }
 

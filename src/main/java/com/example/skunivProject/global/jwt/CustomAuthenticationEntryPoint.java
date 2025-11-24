@@ -24,7 +24,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        // 🔹 수정된 부분: onFailure 메소드 시그니처에 맞게 호출
+        // onFailure 메소드 시그니처에 맞게 호출
         // 첫 번째 인자로 ErrorCode Enum 자체를, 두 번째 인자로 result에 들어갈 값을 전달
         ApiResponse<Object> errorResponse = ApiResponse.onFailure(errorCode, null);
 

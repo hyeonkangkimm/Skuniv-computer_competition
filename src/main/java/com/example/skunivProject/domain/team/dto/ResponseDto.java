@@ -14,7 +14,10 @@ public class ResponseDto {
     @Builder
     public static class MyTeamDto {
         private Long userId;
+        private String username; // 🔹 요청자(본인)의 username 추가
+        private String name;     // 🔹 요청자(본인)의 name 추가
         private Long teamId;
+        private Long leaderId;
         private String competitionTitle;
         private List<String> memberNames;
         private String roomStatus;

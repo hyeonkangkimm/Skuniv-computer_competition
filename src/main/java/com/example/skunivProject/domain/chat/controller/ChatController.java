@@ -53,16 +53,16 @@ public class ChatController {
     }
 
     /**
-     * 특정 채팅방의 이전 대화 내역 조회 (인가 로직 제거됨)
+     * 특정 채팅방의 이전 대화 내역 조회
      */
     // TODO @PreAuthorize() + Spel
     @GetMapping("/chat/rooms/{roomId}/messages")
     public ResponseEntity<List<ChatMessage>> getChatMessages(
             @PathVariable String roomId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size
+            @RequestParam(defaultValue = "150") int size
     ) {
-        // 인가 로직 없이 바로 서비스 호출
+
         List<ChatMessage> messages = chatMessageService.getChatMessages(roomId, page, size);
         return ResponseEntity.ok(messages);
     }

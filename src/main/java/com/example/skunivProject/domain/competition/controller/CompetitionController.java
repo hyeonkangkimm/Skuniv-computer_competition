@@ -27,8 +27,8 @@ public class CompetitionController {
     //전체 데이터 반환
     @GetMapping("/home")
     public ResponseEntity<ApiResponse<List<ResponseDto.HomeResponseDto>>> getHomeCompetitions() {
-        // isDeleted=false이고, 접수 마감일이 지나지 않은 데이터만 조회
-        List<Competition> competitions = competitionRepository.findAllByIsDeletedFalseAndApplyEndAfter(LocalDateTime.now());
+        // isDeleted=false인 모든 데이터 조회
+        List<Competition> competitions = competitionRepository.findAllByIsDeletedFalse();
 
         // DTO 변환
         List<ResponseDto.HomeResponseDto> dtoList = CompetitionDtoConverter.toHomeResponseDtoList(competitions);

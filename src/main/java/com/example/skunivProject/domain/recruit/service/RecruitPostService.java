@@ -50,6 +50,11 @@ public class RecruitPostService {
         Competition competition = competitionRepository.findById(dto.getCompetitionId())
                 .orElseThrow(() -> new RecruitException(RecruitErrorCode.COMPETITION_NOT_FOUND));
 
+        // [추가] 공모전 중복 모집글 작성 확인
+        if (recruitPostRepository.existsByCompetitionAndWriter(competition, writer)) {
+            throw new RecruitException(RecruitErrorCode.ALREADY_POSTED_COMPETITION);
+        }
+
         if (competition.isDeleted()) {
             throw new RecruitException(RecruitErrorCode.COMPETITION_DELETED);
         }
@@ -65,6 +70,17 @@ public class RecruitPostService {
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
         RecruitPost recruitPost = recruitPostRepository.findById(postId)
                 .orElseThrow(() -> new RecruitException(RecruitErrorCode.RECRUIT_POST_NOT_FOUND));
+        Competition competition = recruitPost.getCompetition();
+
+        // [추가] 모집글 작성자는 해당 공모전에 지원 불가
+        if (recruitPostRepository.existsByCompetitionAndWriter(competition, applicant)) {
+            throw new RecruitException(RecruitErrorCode.WRITER_CANNOT_APPLY_TO_OWN_COMPETITION);
+        }
+
+        // 공모전 중복 지원 확인
+        if (recruitApplyRepository.existsByCompetitionIdAndUserId(competition.getId(), applicant.getId())) {
+            throw new RecruitException(RecruitErrorCode.ALREADY_APPLIED_TO_COMPETITION);
+        }
 
         if (recruitPost.getWriter().getId().equals(applicant.getId())) {
             throw new RecruitException(RecruitErrorCode.CANNOT_APPLY_TO_OWN_POST);
@@ -244,12 +260,27 @@ public class RecruitPostService {
         recruitPostRepository.delete(recruitPost);
     }
 
+    //랜덤 신청자 로직
     @Transactional
-    public ResponseDto.RandomApplyResult randomApply(RequestDto.RandomApply dto, String username) {
+    public ResponseDto.RandomApplyResult randomApply(Long competitionId, RequestDto.RandomApply dto, String username) {
         Users applicant = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        Competition competition = competitionRepository.findById(competitionId)
+                .orElseThrow(() -> new RecruitException(RecruitErrorCode.COMPETITION_NOT_FOUND));
 
-        List<RecruitPost> availablePosts = recruitPostRepository.findAllByStatusAndRandomApplySetting(PostStatus.OPEN, RandomApplySetting.ALLOW);
+        // 모집글 작성자는 해당 공모전에 지원 불가
+        if (recruitPostRepository.existsByCompetitionAndWriter(competition, applicant)) {
+            throw new RecruitException(RecruitErrorCode.WRITER_CANNOT_APPLY_TO_OWN_COMPETITION);
+        }
+
+        // 공모전 중복 지원 확인
+        if (recruitApplyRepository.existsByCompetitionIdAndUserId(competition.getId(), applicant.getId())) {
+            throw new RecruitException(RecruitErrorCode.ALREADY_APPLIED_TO_COMPETITION);
+        }
+
+        List<RecruitPost> availablePosts = recruitPostRepository.findAllByCompetitionAndStatusAndRandomApplySetting(
+                competition, PostStatus.OPEN, RandomApplySetting.ALLOW
+        );
 
         List<RecruitPost> filteredPosts = availablePosts.stream()
                 .filter(post -> !post.getWriter().getId().equals(applicant.getId()))
@@ -272,12 +303,15 @@ public class RecruitPostService {
         }
 
         long minRemainingCapacity = postsWithRemainingCapacity.stream()
-                .mapToLong(post -> post.getMaxCapacity() - recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED))
+                .mapToLong(post -> post.getMaxCapacity() -
+                        recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED))
                 .min()
                 .orElse(Long.MAX_VALUE);
 
         List<RecruitPost> bestFitPosts = postsWithRemainingCapacity.stream()
-                .filter(post -> (post.getMaxCapacity() - recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED)) == minRemainingCapacity)
+                .filter(post -> (post.getMaxCapacity() -
+                        recruitApplyRepository.countByRecruitPostAndStatus(post, ApplyStatus.ACCEPTED))
+                        == minRemainingCapacity)
                 .collect(Collectors.toList());
 
         RecruitPost targetPost = bestFitPosts.get(new Random().nextInt(bestFitPosts.size()));

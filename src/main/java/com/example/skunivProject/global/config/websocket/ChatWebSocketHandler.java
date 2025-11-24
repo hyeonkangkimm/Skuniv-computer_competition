@@ -31,7 +31,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 
-        // JSON 파싱
         RequestDto.ChatSocketRequest req = objectMapper.readValue(
                 message.getPayload(),
                 RequestDto.ChatSocketRequest.class
@@ -45,16 +44,17 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
             }
 
             case "MESSAGE" -> {
-                // ChatMessageDto 객체 생성 (Long userId 그대로 사용)
                 RequestDto.ChatMessageDto kafkaMsg = RequestDto.ChatMessageDto.builder()
                         .roomId(req.getRoomId())
-                        .userId(req.getUserId()) // Long 타입
+                        .userId(req.getUserId())
+                        .username(req.getUsername())
+                        .name(req.getName()) // name 추가
                         .message(req.getMessage())
                         .timestamp(System.currentTimeMillis())
                         .build();
-                // Kafka로 보내기 전에 로그
-                log.info("[WebSocket] Sending to Kafka: room={}, user={}, message={}",
-                        kafkaMsg.getRoomId(), kafkaMsg.getUserId(), kafkaMsg.getMessage());
+                
+                log.info("[WebSocket] Sending to Kafka: room={}, user={}, username={}, name={}, message={}",
+                        kafkaMsg.getRoomId(), kafkaMsg.getUserId(), kafkaMsg.getUsername(), kafkaMsg.getName(), kafkaMsg.getMessage());
 
                 kafkaProducer.sendChatMessage(kafkaMsg);
             }

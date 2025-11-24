@@ -18,7 +18,7 @@ public class ResponseDto {
     }
 
     /**
-     * 계정 보기(내 정보 조회)를 위한 응답 DTO
+     * 계정 보기를 위한 응답 DTO
      */
     @Getter
     @Builder

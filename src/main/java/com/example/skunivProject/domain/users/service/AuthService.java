@@ -1,11 +1,11 @@
 package com.example.skunivProject.domain.users.service;
 
+import com.example.skunivProject.domain.users.dto.RequestDto;
+import com.example.skunivProject.domain.users.dto.ResponseDto;
 import com.example.skunivProject.domain.users.entity.Users;
 import com.example.skunivProject.domain.users.exception.UserException;
 import com.example.skunivProject.domain.users.exception.code.UserErrorCode;
 import com.example.skunivProject.domain.users.repository.UserRepository;
-import com.example.skunivProject.domain.users.dto.RequestDto;
-import com.example.skunivProject.domain.users.dto.ResponseDto;
 import com.example.skunivProject.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,22 +45,22 @@ public class AuthService {
     @Transactional
     public ResponseDto.LoginResponseDto login(RequestDto.LoginDto loginDto) {
 
-        // 1. 아이디 존재 여부 및 비밀번호 검증
+        //아이디 존재 여부 및 비밀번호 검증
         Users user = userRepository.findByUsername(loginDto.getUsername())
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
             throw new UserException(UserErrorCode.INVALID_PASSWORD);
         }
 
-        // 2. Spring Security 인증 토큰 생성 및 인증
+        //Spring Security 인증 토큰 생성 및 인증
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // 3. JWT 토큰 생성
+        //JWT 토큰 생성
         String accessToken = jwtTokenProvider.createToken(authentication);
 
-        // 4. 응답 DTO에 추가 정보(name, rank)를 담아 반환
+        //응답 DTO에 추가 정보(name, rank)를 담아 반환
         return ResponseDto.LoginResponseDto.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
