@@ -34,7 +34,19 @@ public class CrawlerRunner implements CommandLineRunner {
                 "rSW3rryZv7-Ml0u2sExn_NFybJsG7YB4v26hiWpawftBpx0Ow-IUOOSs_Y1GAgQKZOtBG74tCu6U_4IddV2MOn2DQ8AHY0uMVGNc94nhI25mkIMMDl5KuebcJyufrnY_",
                 "rSW3rryZv7-Ml0u2sExn_JPQvfG6X2jRxjxd5yB1LyRdN1e2JDtNt1pfELP8OS03_MxEaejeLShajbGkIy7lmaO5ObqNG0JlfTGsNzoUBERlxIFaT_GWxXNPkCtha9S0",
                 "jSz0J0WNJB45MZv9sO3VweY8z1ulOyoqGVdV1auFpzX-BaeqqfhQSA1H_Mu3KRdvdDC3pRXoPVTS_795YXuginU2dErqWfVui_H9gZW6czNg5qAJkb3bWIMVgga0OB_j",
-                "rSW3rryZv7-Ml0u2sExn_BTMxbpVNsbGeTlCHnWI-eCZScnOUkc9PbmCRX0JWzbrKeOw_VGuWE5EdaXm9VkInE-K2wagyLAVHLWLtfm_GtV1I40GJx9kXbzB3vZ9KNNA"
+                "rSW3rryZv7-Ml0u2sExn_BTMxbpVNsbGeTlCHnWI-eCZScnOUkc9PbmCRX0JWzbrKeOw_VGuWE5EdaXm9VkInE-K2wagyLAVHLWLtfm_GtV1I40GJx9kXbzB3vZ9KNNA",
+                "rSW3rryZv7-Ml0u2sExn_EjRUn7-loXCYPYxsuM1vNyvjc9iPXHVcM4h-g6LTY5tW6tnMceaiGpHwqr6kiWWkBE21VBtcvAqwg2x-4umUyvLKoR8Hdp6xaOi6aVDMRj0",
+                "rSW3rryZv7-Ml0u2sExn_B0tj88HIhKiuM43g1BIeHiC3a3ldu5ziMV-VC-0eVBjIngZiNg12cl3oVwOMowoI-FZvLFwSPlD3G5N69NWOb1T3-0Cu7BfqkugTJ_VIe0W",
+                "rSW3rryZv7-Ml0u2sExn_MylO_vKyzUn5lp3RgF7BzwjzZj92FficWRa_pd6kGOonu67_d6XDAgGyDB9p9kfPC-lEKRyDddnmgciHpnt0KkD0MvyRQpujHEVrD91znGe",
+                "rSW3rryZv7-Ml0u2sExn_N37l5nbg3qu1f3BgLcnBnAvK9ojLTDgztVRaFGE8j-twCNaMqUTUHe7PzmK1oTtlOJH_t8aC7u4I5g8AXnWg6ApDhV39BhUwMlN22NHJGFC",
+                "rSW3rryZv7-Ml0u2sExn_NSLhvN8gxVJw_VteTMxRD6li629B5nE2dBmwWj28ZUJpKvKNIpuoJCI22JFc0eDtApYAA7oDv3mECmEzR_5zkBqfJw-wqM5ribDLIo4offa",
+                "rSW3rryZv7-Ml0u2sExn_M3lrT3Y8YUBTctxbElCD95JVeP4WQP_B4b17gDls8RwGM6DchgQcDSm_v6ggqwkfnwKa339WgflT3PvBWNPMvDidzrmELBheHpjlSOXA0CE",
+                "rSW3rryZv7-Ml0u2sExn_PlDknf7x3W7mIQ_BV7YD3YlEDmBPwRF9Us2lxttAYdI9GyuBXMRG49LGBPdwJ-DFq0Pw60reliriEx-I4Jnz3La2arMo2yJc0GHb3B7hADH",
+                "rSW3rryZv7-Ml0u2sExn_CvmcNQBf8_L6F-_iAzbK-nOmJbRIv9WcETHYVrmgXDg4J9-6BNLuy0nL6sraHuIa9aypa_oPkrIhON5b_l4w3ErDUScR1jGQHqoX-ptWPbO",
+                "rSW3rryZv7-Ml0u2sExn_KiO9k79CvXfe7SNJnQeQA8ZLxuo4jLYdBe1dv0MIMt0IfGgwHBEHfdD5lzUd-j6mPNi5o4uv65hhHFRx56PtOKUP7pNrPkKBTODcjkGi8_6",
+                "rSW3rryZv7-Ml0u2sExn_B0tj88HIhKiuM43g1BIeHj3KsCVL6zSz0794X7s7-zlnB3qsNKO2cg0BXq1rTwGr_v_zNSCnh7VBmyT78l8aDdsFIZ0L4BLJ7u6hNZMse57",
+                "rSW3rryZv7-Ml0u2sExn_KLIO-H_nDopEx9Acg8sgPMi1cZgaCp67VKTdOR5tNix7rgLC5aMfQ4nQJQsn7eYgSTjUOFLv_9UehGZ4-nn0SvN1GLxtgP-SuIx0mRCFpJF"
+
 
         );
         for (String qs : queryStrings) {

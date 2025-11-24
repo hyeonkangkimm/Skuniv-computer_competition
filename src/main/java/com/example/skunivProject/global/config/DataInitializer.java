@@ -121,10 +121,28 @@ public class DataInitializer implements CommandLineRunner {
                     .awardFirst("1000만원")
                     .homePage("http://example.com")
                     .thinkGoodLink("http://example.com/finished")
-                    .imgUrl("https://www.thinkcontest.com/thinkgood/common/display.do?filepath=contest_poster/image/&filename=ede23a4443af4c829d4e96bbb148cdeb.jpg&filegubun=poster")
+                    .imgUrl("https://www.thinkcontest.com/thinkgood/common/display.do?filepath=contest_poster/image/&filename=c6b04fc54b5940a7b0b7d58c14521002.png&filegubun=poster")
                     .build();
             competitionRepository.save(finishedCompetition);
             log.info("초기 데이터: 종료된 공모전 생성 완료 (title: {})", finishedContestTitle);
+        }
+        String finishedContestTitle1 = "작년에 끝난 백엔드 공모전";
+        if (!competitionRepository.existsByTitle(finishedContestTitle1)) {
+            Competition finishedCompetition1 = Competition.builder()
+                    .title(finishedContestTitle1)
+                    .host("서경대학교")
+                    .organizer("서경대학교 백엔드")
+                    .category("백엔드, 딥러닝")
+                    .qualification("서경대학생")
+                    .applyStart(LocalDateTime.now().minusYears(1).minusMonths(1))
+                    .applyEnd(LocalDateTime.now().minusYears(1))
+                    .awardFirst("1000만원")
+                    .homePage("http://example.com")
+                    .thinkGoodLink("http://example.com/finished")
+                    .imgUrl("https://www.thinkcontest.com/thinkgood/common/display.do?filepath=contest_poster/image/&filename=c6b04fc54b5940a7b0b7d58c14521002.png&filegubun=poster")
+                    .build();
+            competitionRepository.save(finishedCompetition1);
+            log.info("초기 데이터: 종료된 공모전 생성 완료 (title: {})", finishedContestTitle1);
         }
     }
 }
